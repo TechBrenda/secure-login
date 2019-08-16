@@ -6,10 +6,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
 
 @Entity
-@Table
 @SequenceGenerator(name = "user_status_seq", initialValue = 1, allocationSize = 1)
 public class UserAccountStatus {
   @Id
