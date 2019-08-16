@@ -1,10 +1,13 @@
 package org.techbrenda.securelogin.auth.model;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapsId;
 import javax.persistence.OneToOne;
@@ -38,6 +41,9 @@ public class UserAccount {
   
   @ManyToOne
   private UserAccountStatus userAccountStatus;
+  
+  @ManyToMany
+  private Set<Authority> authorities = new HashSet<>();
 
   public UserAccount() {
   }
