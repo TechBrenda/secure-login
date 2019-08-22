@@ -25,8 +25,6 @@ public class UserProfile {
 
   private String displayName;
 
-  private Boolean acceptTermsOfService;
-
   @Column(nullable = false)
   private String timeZone;
 
@@ -63,14 +61,6 @@ public class UserProfile {
 
   public void setDisplayName(String displayName) {
     this.displayName = displayName;
-  }
-
-  public Boolean getAcceptTermsOfService() {
-    return acceptTermsOfService;
-  }
-
-  public void setAcceptTermsOfService(Boolean acceptTermsOfService) {
-    this.acceptTermsOfService = acceptTermsOfService;
   }
 
   public String getTimeZone() {

@@ -46,6 +46,8 @@ public class UserAccount {
   
   private String emailConfirmationToken;
   
+  private Boolean acceptTermsOfService;
+  
   @ManyToOne
   private UserAccountStatus userAccountStatus;
   
@@ -117,6 +119,14 @@ public class UserAccount {
 
   public void setEmailConfirmationToken(String emailConfirmationToken) {
     this.emailConfirmationToken = emailConfirmationToken;
+  }
+
+  public Boolean getAcceptTermsOfService() {
+    return acceptTermsOfService;
+  }
+
+  public void setAcceptTermsOfService(Boolean acceptTermsOfService) {
+    this.acceptTermsOfService = acceptTermsOfService;
   }
 
   public UserAccountStatus getUserAccountStatus() {
