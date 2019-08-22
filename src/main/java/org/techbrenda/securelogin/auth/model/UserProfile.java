@@ -2,29 +2,20 @@ package org.techbrenda.securelogin.auth.model;
 
 import java.util.UUID;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.MapsId;
 import javax.persistence.OneToOne;
 
-import org.hibernate.annotations.GenericGenerator;
-
 @Entity
-// @SequenceGenerator(name = "user_profile_seq", initialValue = 1,
-// allocationSize = 1)
 public class UserProfile {
   @Id
-  // @GeneratedValue(strategy = GenerationType.SEQUENCE, generator =
-  // "user_profile_seq")
-  @GeneratedValue(generator = "UUID")
-  @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-  @Column(nullable = false, updatable = false)
   private UUID id;
-
-  @Column(nullable = false, unique = true, length = 254)
-  private String email;
+  
+  @OneToOne
+  @MapsId
+  private UserAccount userAccount;
 
   @Column(nullable = false)
   private String firstName;
@@ -39,9 +30,6 @@ public class UserProfile {
   @Column(nullable = false)
   private String timeZone;
 
-  @OneToOne(mappedBy = "userProfile", cascade = CascadeType.ALL)
-  private UserAccount userAccount;
-
   public UserProfile() {
   }
 
@@ -51,14 +39,6 @@ public class UserProfile {
 
   public void setId(UUID id) {
     this.id = id;
-  }
-
-  public String getEmail() {
-    return email;
-  }
-
-  public void setEmail(String email) {
-    this.email = email;
   }
 
   public String getFirstName() {

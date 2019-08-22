@@ -5,25 +5,33 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.MapsId;
 import javax.persistence.OneToOne;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+
+import org.hibernate.annotations.GenericGenerator;
 
 @Entity
 public class UserAccount {
   
   @Id
+  @GeneratedValue(generator = "UUID")
+  @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+  @Column(nullable = false, updatable = false)
   private UUID id;
   
-  @OneToOne
-  @MapsId
+  @OneToOne(mappedBy = "userAccount", cascade = CascadeType.ALL)
   private UserProfile userProfile;
+  
+  @Column(nullable = false, unique = true, length = 254)
+  private String email;
   
   @Column(nullable = false)
   private String password;
@@ -61,6 +69,14 @@ public class UserAccount {
 
   public void setUserProfile(UserProfile userProfile) {
     this.userProfile = userProfile;
+  }
+
+  public String getEmail() {
+    return email;
+  }
+
+  public void setEmail(String email) {
+    this.email = email;
   }
 
   public String getPassword() {
@@ -109,6 +125,14 @@ public class UserAccount {
 
   public void setUserAccountStatus(UserAccountStatus userAccountStatus) {
     this.userAccountStatus = userAccountStatus;
+  }
+
+  public Set<Authority> getAuthorities() {
+    return authorities;
+  }
+
+  public void setAuthorities(Set<Authority> authorities) {
+    this.authorities = authorities;
   }
 
   @Override
