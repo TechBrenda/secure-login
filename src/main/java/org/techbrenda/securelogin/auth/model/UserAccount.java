@@ -3,6 +3,7 @@ package org.techbrenda.securelogin.auth.model;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -18,7 +19,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 public class UserAccount {
   
   @Id
-  private Long id;
+  private UUID id;
   
   @OneToOne
   @MapsId
@@ -46,11 +47,11 @@ public class UserAccount {
   public UserAccount() {
   }
 
-  public Long getId() {
+  public UUID getId() {
     return id;
   }
 
-  public void setId(Long id) {
+  public void setId(UUID id) {
     this.id = id;
   }
 
