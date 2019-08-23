@@ -9,5 +9,5 @@ import org.techbrenda.securelogin.auth.model.UserAccount;
 @Repository
 public interface UserAccountRepository extends JpaRepository<UserAccount, UUID> {
   
-  public UserAccount findUserAccountByEmail(String email);
+  UserAccount findByEmail(String email);
 }
