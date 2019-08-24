@@ -11,7 +11,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -36,6 +35,15 @@ public class UserAccount {
   @Column(nullable = false)
   private String password;
   
+  private Boolean enabled;
+  
+  // false if account locked for 13 months
+  private Boolean accountNonExpired;
+  
+  private Boolean credentialsNonExpired;
+  
+  private Boolean accountNonLocked;
+  
   @Column(nullable = false)
   private String passwordHashAlgorithm;
   
@@ -47,9 +55,6 @@ public class UserAccount {
   private String emailConfirmationToken;
   
   private Boolean acceptTermsOfService;
-  
-  @ManyToOne
-  private UserAccountStatus userAccountStatus;
   
   @ManyToMany
   private Set<Authority> authorities = new HashSet<>();
@@ -87,6 +92,38 @@ public class UserAccount {
 
   public void setPassword(String password) {
     this.password = password;
+  }
+
+  public Boolean getEnabled() {
+    return enabled;
+  }
+
+  public void setEnabled(Boolean enabled) {
+    this.enabled = enabled;
+  }
+
+  public Boolean getAccountNonExpired() {
+    return accountNonExpired;
+  }
+
+  public void setAccountNonExpired(Boolean accountNonExpired) {
+    this.accountNonExpired = accountNonExpired;
+  }
+
+  public Boolean getCredentialsNonExpired() {
+    return credentialsNonExpired;
+  }
+
+  public void setCredentialsNonExpired(Boolean credentialsNonExpired) {
+    this.credentialsNonExpired = credentialsNonExpired;
+  }
+
+  public Boolean getAccountNonLocked() {
+    return accountNonLocked;
+  }
+
+  public void setAccountNonLocked(Boolean accountNonLocked) {
+    this.accountNonLocked = accountNonLocked;
   }
 
   public String getPasswordHashAlgorithm() {
@@ -127,14 +164,6 @@ public class UserAccount {
 
   public void setAcceptTermsOfService(Boolean acceptTermsOfService) {
     this.acceptTermsOfService = acceptTermsOfService;
-  }
-
-  public UserAccountStatus getUserAccountStatus() {
-    return userAccountStatus;
-  }
-
-  public void setUserAccountStatus(UserAccountStatus userAccountStatus) {
-    this.userAccountStatus = userAccountStatus;
   }
 
   public Set<Authority> getAuthorities() {
