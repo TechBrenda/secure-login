@@ -5,22 +5,32 @@ import java.util.Date;
 
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.DatatypeConverter;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.SignatureException;
+import io.jsonwebtoken.UnsupportedJwtException;
 
 @Service
 public class JwtService {
   
+  private static final Logger logger = LoggerFactory.getLogger(JwtService.class);
+  
   @Value("${jwt.signing.key.secret}")
   private String secret;
   
-  public String createJWT(String id, String issuer, String subject, long ttlMillis) {
+  @Value("${jwt.expiration.milliseconds}")
+  private String expMilliseconds;
+  
+  public String createJWT(String subject) {
     SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS512;
     long nowMillis = System.currentTimeMillis();
     Date now = new Date(nowMillis);
@@ -29,12 +39,11 @@ public class JwtService {
     Key signingKey = new SecretKeySpec(keySecretBytes, signatureAlgorithm.getJcaName());
     
     JwtBuilder builder = Jwts.builder()
-                              .setId(id)
                               .setIssuedAt(now)
                               .setSubject(subject)
-                              .setIssuer(issuer)
                               .signWith(signatureAlgorithm, signingKey);
     
+    long ttlMillis = Long.parseLong(expMilliseconds);
     if (ttlMillis >= 0) {
       long expMillis = nowMillis + ttlMillis;
       Date expDate = new Date(expMillis);
@@ -44,24 +53,36 @@ public class JwtService {
     return builder.compact();
   }
   
-  private Claims parseJWT(String jwt, String subject) {
+  private Claims parseJWT(String jwt) {
+    try {
     Claims claims = Jwts.parser()
                 .setSigningKey(DatatypeConverter.parseBase64Binary(secret))
                 .parseClaimsJws(jwt)
                 .getBody();
-                
-    
-                
     return claims;
+    } catch (ExpiredJwtException exception) {
+      logger.warn("Request to parse expired JWT: {} failed: {}", jwt, exception.getMessage());
+    } catch (UnsupportedJwtException exception) {
+      logger.warn("Request to parse unsupported JWT: {} failed: {}", jwt, exception.getMessage());
+    } catch (MalformedJwtException exception) {
+      logger.warn("Request to parse invalid JWT: {} failed: {}", jwt, exception.getMessage());
+    } catch (SignatureException exception) {
+      logger.warn("Request to parse JWT with invalid signature: {} failed: {}", jwt, exception.getMessage());
+    } catch (IllegalArgumentException exception) {
+      logger.warn("Request to parse empty or null JWT: {} failed: {}", jwt, exception.getMessage());
+    }
+    
+    return null;
   }
   
-  public String refreshJWT(String jwt, String subject, long ttlMillis) {
-    Claims claims = parseJWT(jwt, subject);
+  public String refreshJWT(String jwt) {
+    Claims claims = parseJWT(jwt);
     
     long nowMillis = System.currentTimeMillis();
     Date now = new Date(nowMillis);
     claims.setIssuedAt(now);
     
+    long ttlMillis = Long.parseLong(expMilliseconds);
     if (ttlMillis >= 0) {
       long expMillis = nowMillis + ttlMillis;
       Date expDate = new Date(expMillis);
