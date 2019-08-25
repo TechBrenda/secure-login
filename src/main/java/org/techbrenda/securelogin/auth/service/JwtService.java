@@ -75,23 +75,11 @@ public class JwtService {
     return null;
   }
   
+  public String getJwtSubject(Claims claims) {
+    return claims.getSubject();
+  }
+  
   public String refreshJWT(String jwt) {
-    Claims claims = parseJWT(jwt);
-    
-    long nowMillis = System.currentTimeMillis();
-    Date now = new Date(nowMillis);
-    claims.setIssuedAt(now);
-    
-    long ttlMillis = Long.parseLong(expMilliseconds);
-    if (ttlMillis >= 0) {
-      long expMillis = nowMillis + ttlMillis;
-      Date expDate = new Date(expMillis);
-      claims.setExpiration(expDate);
-    }
-    
-    return Jwts.builder()
-                .setClaims(claims)
-                .signWith(SignatureAlgorithm.HS512, DatatypeConverter.parseBase64Binary(secret))
-                .compact();
+    return createJWT(getJwtSubject(parseJWT(jwt)));
   }
 }
