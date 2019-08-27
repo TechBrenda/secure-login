@@ -10,12 +10,16 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
 
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
   
   @Autowired
   private UserDetailsService userDetailsService;
+  
+  @Autowired
+  private JwtAuthenticationFilter jwtAuthenticationFilter;
   
   @Override
   public void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -34,7 +38,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         .csrf().disable();
     
     httpSecurity
-        .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+        .and()
+        .addFilterBefore(jwtAuthenticationFilter, AnonymousAuthenticationFilter.class);
         
     httpSecurity
         .authorizeRequests().antMatchers("/").permitAll()

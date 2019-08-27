@@ -31,6 +31,10 @@ public class JwtService {
   private String expMilliseconds;
   
   public String createJWT(String subject) {
+    if (subject == null) {
+      return null;
+    }
+    
     SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS512;
     long nowMillis = System.currentTimeMillis();
     Date now = new Date(nowMillis);
@@ -75,11 +79,15 @@ public class JwtService {
     return null;
   }
   
-  public String getJwtSubject(Claims claims) {
+  public String getJwtSubject(String jwt) {
+    Claims claims = parseJWT(jwt);
+    if (claims == null) {
+      return null;
+    }
     return claims.getSubject();
   }
   
   public String refreshJWT(String jwt) {
-    return createJWT(getJwtSubject(parseJWT(jwt)));
+    return createJWT(getJwtSubject(jwt));
   }
 }
