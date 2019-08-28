@@ -7,8 +7,9 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.DatatypeConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.techbrenda.securelogin.auth.config.JwtProperties;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -24,11 +25,14 @@ public class JwtService {
   
   private static final Logger logger = LoggerFactory.getLogger(JwtService.class);
   
-  @Value("${jwt.signing.key.secret}")
+  /* @Value("${jwt.signing-secret}")
   private String secret;
   
-  @Value("${jwt.expiration.milliseconds}")
-  private String expMilliseconds;
+  @Value("${jwt.expiration-milliseconds}")
+  private String expMilliseconds; */
+  
+  @Autowired
+  private JwtProperties properties;
   
   public String createJWT(String subject) {
     if (subject == null) {
@@ -39,7 +43,7 @@ public class JwtService {
     long nowMillis = System.currentTimeMillis();
     Date now = new Date(nowMillis);
     
-    byte[] keySecretBytes = DatatypeConverter.parseBase64Binary(secret);
+    byte[] keySecretBytes = DatatypeConverter.parseBase64Binary(properties.getSigningSecret());
     Key signingKey = new SecretKeySpec(keySecretBytes, signatureAlgorithm.getJcaName());
     
     JwtBuilder builder = Jwts.builder()
@@ -47,7 +51,7 @@ public class JwtService {
                               .setSubject(subject)
                               .signWith(signatureAlgorithm, signingKey);
     
-    long ttlMillis = Long.parseLong(expMilliseconds);
+    long ttlMillis = properties.getExpirationMilliseconds();
     if (ttlMillis >= 0) {
       long expMillis = nowMillis + ttlMillis;
       Date expDate = new Date(expMillis);
@@ -60,7 +64,7 @@ public class JwtService {
   private Claims parseJWT(String jwt) {
     try {
     Claims claims = Jwts.parser()
-                .setSigningKey(DatatypeConverter.parseBase64Binary(secret))
+                .setSigningKey(DatatypeConverter.parseBase64Binary(properties.getSigningSecret()))
                 .parseClaimsJws(jwt)
                 .getBody();
     return claims;

@@ -1,0 +1,21 @@
+{
+  "groups": [
+    {
+      "name": "jwt",
+      "type": "org.techbrenda.securelogin.auth.config.JwtProperties",
+      "sourceType": "org.techbrenda.securelogin.auth.config.JwtProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "jwt.signing-secret",
+      "type": "java.lang.String",
+      "sourceType": "org.techbrenda.securelogin.auth.config.JwtProperties"
+    },
+    {
+      "name": "jwt.expiration-milliseconds",
+      "type": "java.lang.Long",
+      "sourceType": "org.techbrenda.securelogin.auth.config.JwtProperties"
+    }
+  ]
+}
