@@ -1,4 +1,4 @@
-package org.techbrenda.securelogin.auth;
+package org.techbrenda.securelogin.auth.config;
 
 import java.io.IOException;
 
