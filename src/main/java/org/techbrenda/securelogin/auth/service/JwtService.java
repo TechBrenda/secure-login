@@ -25,12 +25,6 @@ public class JwtService {
   
   private static final Logger logger = LoggerFactory.getLogger(JwtService.class);
   
-  /* @Value("${jwt.signing-secret}")
-  private String secret;
-  
-  @Value("${jwt.expiration-milliseconds}")
-  private String expMilliseconds; */
-  
   @Autowired
   private JwtProperties properties;
   
