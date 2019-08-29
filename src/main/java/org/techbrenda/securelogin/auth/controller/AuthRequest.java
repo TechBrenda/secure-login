@@ -5,7 +5,6 @@ public class AuthRequest {
   private String password;
   
   public AuthRequest() {
-    super();
   }
   
   public String getEmail() {
