@@ -57,11 +57,11 @@ public class JwtService {
   
   private Claims parseJWT(String jwt) {
     try {
-    Claims claims = Jwts.parser()
-                .setSigningKey(DatatypeConverter.parseBase64Binary(properties.getSigningSecret()))
-                .parseClaimsJws(jwt)
-                .getBody();
-    return claims;
+      Claims claims = Jwts.parser()
+                  .setSigningKey(DatatypeConverter.parseBase64Binary(properties.getSigningSecret()))
+                  .parseClaimsJws(jwt)
+                  .getBody();
+      return claims;
     } catch (ExpiredJwtException exception) {
       logger.warn("Request to parse expired JWT: {} failed: {}", jwt, exception.getMessage());
     } catch (UnsupportedJwtException exception) {

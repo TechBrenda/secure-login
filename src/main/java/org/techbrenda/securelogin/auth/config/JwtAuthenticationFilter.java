@@ -46,16 +46,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
       UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
       
+      UsernamePasswordAuthenticationToken authenticationToken = null;
+      
       // JWT is only for authentication. User access must be verified.
       if (userDetails.isEnabled() 
             && userDetails.isAccountNonExpired() 
             && userDetails.isAccountNonLocked() 
             && userDetails.isCredentialsNonExpired()) {
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-            userDetails, null, userDetails.getAuthorities());
+        authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
         authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
       }
+      SecurityContextHolder.getContext().setAuthentication(authenticationToken);
     }
   }
   
