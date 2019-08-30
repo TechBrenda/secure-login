@@ -39,7 +39,7 @@ public class AuthController {
     Authentication authenticatedUser = authenticate(authRequest.getEmail(), authRequest.getPassword());
     
     UserDetails userDetails = (UserDetails) authenticatedUser.getPrincipal();
-    AuthResponse authResponse = new AuthResponse(jwtService.getJwtSubject(userDetails.getUsername()));
+    AuthResponse authResponse = new AuthResponse(jwtService.createJWT(userDetails.getUsername()));
       
     return ResponseEntity.ok(authResponse);
   }
