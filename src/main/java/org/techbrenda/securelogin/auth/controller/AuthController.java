@@ -14,8 +14,8 @@ import org.springframework.security.authentication.CredentialsExpiredException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,15 +33,12 @@ public class AuthController {
   @Autowired
   private JwtService jwtService;
   
-  @Autowired
-  private UserDetailsService userDetailsService;
-  
   @PostMapping("/authenticate")
   public ResponseEntity<?> createAuthToken(@RequestBody AuthRequest authRequest) throws AuthException {
     // throws AuthException if authentication fails
-    authenticate(authRequest.getEmail(), authRequest.getPassword());
+    Authentication authenticatedUser = authenticate(authRequest.getEmail(), authRequest.getPassword());
     
-    UserDetails userDetails = userDetailsService.loadUserByUsername(authRequest.getEmail());
+    UserDetails userDetails = (UserDetails) authenticatedUser.getPrincipal();
     AuthResponse authResponse = new AuthResponse(jwtService.getJwtSubject(userDetails.getUsername()));
       
     return ResponseEntity.ok(authResponse);
@@ -67,12 +64,12 @@ public class AuthController {
     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
   }
   
-  private void authenticate(String username, String password) {
+  private Authentication authenticate(String username, String password) {
     Objects.requireNonNull(username);
     Objects.requireNonNull(password);
     
     try {
-      authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+      return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
     } catch (DisabledException e) {
       throw new AuthException("USER_DISABLED", e);
     } catch (LockedException e) {
