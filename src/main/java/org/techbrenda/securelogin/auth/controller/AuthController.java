@@ -38,6 +38,7 @@ public class AuthController {
   
   @PostMapping("/authenticate")
   public ResponseEntity<?> createAuthToken(@RequestBody AuthRequest authRequest) throws AuthException {
+    // throws AuthException if authentication fails
     authenticate(authRequest.getEmail(), authRequest.getPassword());
     
     UserDetails userDetails = userDetailsService.loadUserByUsername(authRequest.getEmail());
@@ -49,9 +50,12 @@ public class AuthController {
   @GetMapping("/refresh")
   public ResponseEntity<?> refreshAuthToken(HttpServletRequest request) throws AuthException {
     // authorization takes place in JwtAuthenticationFilter
+    // missing Auth header routes to Http403ForbiddenEntryPoint and never reaches this method
     String token = request.getHeader("Authorization").substring(7);
     
+    // throws AuthException if exception found during token parsing
     String refreshedToken = jwtService.refreshJWT(token);
+    
     return ResponseEntity.ok(new AuthResponse(refreshedToken));
   }
   
@@ -71,14 +75,14 @@ public class AuthController {
       authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
     } catch (DisabledException e) {
       throw new AuthException("USER_DISABLED", e);
-    } catch (BadCredentialsException e) {
-      throw new AuthException("INVALID_CREDENTIALS", e);
     } catch (LockedException e) {
       throw new AuthException("ACCOUNT_LOCKED", e);
     } catch (CredentialsExpiredException e) {
       throw new AuthException("PASSWORD_EXPIRED", e);
     } catch (AccountExpiredException e) {
       throw new AuthException("ACCOUNT_EXPIRED", e);
+    } catch (BadCredentialsException e) {
+      throw new AuthException("INVALID_CREDENTIALS", e);
     }
   }
 }
