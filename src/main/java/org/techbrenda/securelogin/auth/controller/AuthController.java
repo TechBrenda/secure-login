@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.techbrenda.securelogin.auth.exception.AuthException;
 import org.techbrenda.securelogin.auth.service.JwtService;
 
 @RestController
@@ -46,8 +47,12 @@ public class AuthController {
   }
   
   @GetMapping("/refresh")
-  public void refreshAuthToken(HttpServletRequest request) {
+  public ResponseEntity<?> refreshAuthToken(HttpServletRequest request) throws AuthException {
+    // authorization takes place in JwtAuthenticationFilter
+    String token = request.getHeader("Authorization").substring(7);
     
+    String refreshedToken = jwtService.refreshJWT(token);
+    return ResponseEntity.ok(new AuthResponse(refreshedToken));
   }
   
   @PostMapping("/register")
@@ -65,15 +70,15 @@ public class AuthController {
     try {
       authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
     } catch (DisabledException e) {
-      throw new RuntimeException("USER_DISABLED", e);
+      throw new AuthException("USER_DISABLED", e);
     } catch (BadCredentialsException e) {
-      throw new RuntimeException("INVALID_CREDENTIALS", e);
+      throw new AuthException("INVALID_CREDENTIALS", e);
     } catch (LockedException e) {
-      throw new RuntimeException("ACCOUNT_LOCKED", e);
+      throw new AuthException("ACCOUNT_LOCKED", e);
     } catch (CredentialsExpiredException e) {
-      throw new RuntimeException("PASSWORD_EXPIRED", e);
+      throw new AuthException("PASSWORD_EXPIRED", e);
     } catch (AccountExpiredException e) {
-      throw new RuntimeException("ACCOUNT_EXPIRED", e);
+      throw new AuthException("ACCOUNT_EXPIRED", e);
     }
   }
 }
