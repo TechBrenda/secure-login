@@ -1,4 +1,4 @@
-package org.techbrenda.securelogin.auth.controller;
+package org.techbrenda.securelogin.auth.exception;
 
 public class AuthException extends RuntimeException {
 

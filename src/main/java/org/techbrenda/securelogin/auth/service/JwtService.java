@@ -5,11 +5,11 @@ import java.util.Date;
 
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.DatatypeConverter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.techbrenda.securelogin.auth.config.JwtProperties;
+import org.techbrenda.securelogin.auth.exception.AuthException;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -22,8 +22,6 @@ import io.jsonwebtoken.UnsupportedJwtException;
 
 @Service
 public class JwtService {
-  
-  private static final Logger logger = LoggerFactory.getLogger(JwtService.class);
   
   @Autowired
   private JwtProperties properties;
@@ -62,30 +60,25 @@ public class JwtService {
                   .parseClaimsJws(jwt)
                   .getBody();
       return claims;
-    } catch (ExpiredJwtException exception) {
-      logger.warn("Request to parse expired JWT: {} failed: {}", jwt, exception.getMessage());
-    } catch (UnsupportedJwtException exception) {
-      logger.warn("Request to parse unsupported JWT: {} failed: {}", jwt, exception.getMessage());
-    } catch (MalformedJwtException exception) {
-      logger.warn("Request to parse invalid JWT: {} failed: {}", jwt, exception.getMessage());
-    } catch (SignatureException exception) {
-      logger.warn("Request to parse JWT with invalid signature: {} failed: {}", jwt, exception.getMessage());
-    } catch (IllegalArgumentException exception) {
-      logger.warn("Request to parse empty or null JWT: {} failed: {}", jwt, exception.getMessage());
+    } catch (ExpiredJwtException e) {
+      throw new AuthException("JWT_EXPIRED", e);
+    } catch (UnsupportedJwtException e) {
+      throw new AuthException("JWT_UNSUPPORTED", e);
+    } catch (MalformedJwtException e) {
+      throw new AuthException("JWT_MALFORMED", e);
+    } catch (SignatureException e) {
+      throw new AuthException("JWT_SIGNATURE_EXCEPTION", e);
+    } catch (IllegalArgumentException e) {
+      throw new AuthException("JWT_MISSING", e);
     }
-    
-    return null;
   }
   
-  public String getJwtSubject(String jwt) {
+  public String getJwtSubject(String jwt) throws AuthException {
     Claims claims = parseJWT(jwt);
-    if (claims == null) {
-      return null;
-    }
     return claims.getSubject();
   }
   
-  public String refreshJWT(String jwt) {
+  public String refreshJWT(String jwt) throws AuthException {
     return createJWT(getJwtSubject(jwt));
   }
 }
