@@ -23,7 +23,6 @@ public class EmailVerification {
   private UUID token;
   
   @OneToOne(fetch = FetchType.EAGER)
-  @Column(nullable = false)
   private UserAccount userAccount;
   
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy/MM/dd HH:mm:ss.SSSZ")
