@@ -23,8 +23,6 @@ public class UserProfile {
   @Column(nullable = false)
   private String lastName;
 
-  private String displayName;
-
   @Column(nullable = false)
   private String timeZone;
 
@@ -53,14 +51,6 @@ public class UserProfile {
 
   public void setLastName(String lastName) {
     this.lastName = lastName;
-  }
-
-  public String getDisplayName() {
-    return displayName;
-  }
-
-  public void setDisplayName(String displayName) {
-    this.displayName = displayName;
   }
 
   public String getTimeZone() {

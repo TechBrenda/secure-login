@@ -59,6 +59,9 @@ public class AuthController {
   @PostMapping("/register")
   public void registration() {}
   
+  @GetMapping("/confirmemail")
+  public void confirmRegistration() {}
+  
   @ExceptionHandler({ AuthException.class })
   public ResponseEntity<String> handleAuthException(AuthException e) {
     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
