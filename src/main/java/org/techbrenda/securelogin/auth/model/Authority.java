@@ -15,7 +15,7 @@ public class Authority {
   private Long id;
   
   @Column(nullable = false, unique = true)
-  private String role;
+  private String rolename;
 
   public Authority() {
   }
@@ -28,12 +28,12 @@ public class Authority {
     this.id = id;
   }
 
-  public String getRole() {
-    return role;
+  public String getRolename() {
+    return rolename;
   }
 
-  public void setRole(String role) {
-    this.role = role;
+  public void setRolename(String rolename) {
+    this.rolename = rolename;
   }
 
   @Override

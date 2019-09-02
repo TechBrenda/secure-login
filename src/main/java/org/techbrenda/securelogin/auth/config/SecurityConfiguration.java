@@ -21,9 +21,14 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
   @Autowired
   private JwtAuthenticationFilter jwtAuthenticationFilter;
   
+  @Bean
+  public BCryptPasswordEncoder bCryptPasswordEncoder() {
+    return new BCryptPasswordEncoder();
+  }
+  
   @Override
   public void configure(AuthenticationManagerBuilder auth) throws Exception {
-    auth.userDetailsService(userDetailsService).passwordEncoder(new BCryptPasswordEncoder());
+    auth.userDetailsService(userDetailsService).passwordEncoder(bCryptPasswordEncoder());
   }
   
   @Bean

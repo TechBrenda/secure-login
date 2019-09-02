@@ -44,9 +44,6 @@ public class UserAccount {
   
   private Boolean accountNonLocked;
   
-  @Column(nullable = false)
-  private String passwordHashAlgorithm;
-  
   private String passwordReminderToken;
   
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy/MM/dd HH:mm:ss.SSSZ")
@@ -124,14 +121,6 @@ public class UserAccount {
     this.accountNonLocked = accountNonLocked;
   }
 
-  public String getPasswordHashAlgorithm() {
-    return passwordHashAlgorithm;
-  }
-
-  public void setPasswordHashAlgorithm(String passwordHashAlgorithm) {
-    this.passwordHashAlgorithm = passwordHashAlgorithm;
-  }
-
   public String getPasswordReminderToken() {
     return passwordReminderToken;
   }
@@ -162,6 +151,18 @@ public class UserAccount {
 
   public void setAuthorities(Set<Authority> authorities) {
     this.authorities = authorities;
+  }
+  
+  public void addAuthority(Authority authority) {
+    if (!this.authorities.contains(authority)) {
+      this.authorities.add(authority);
+    }
+  }
+  
+  public void removeAuthority(Authority authority) {
+    if (this.authorities.contains(authority)) {
+      this.authorities.remove(authority);
+    }
   }
 
   @Override

@@ -1,7 +1,6 @@
 package org.techbrenda.securelogin.auth.model;
 
 import java.util.Date;
-import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -20,7 +19,7 @@ public class EmailVerification {
   private Long id;
   
   @Column(nullable = false)
-  private UUID token;
+  private String token;
   
   @OneToOne(fetch = FetchType.EAGER)
   private UserAccount userAccount;
@@ -29,6 +28,12 @@ public class EmailVerification {
   private Date expiration;
 
   public EmailVerification() {
+  }
+  
+  public EmailVerification(String token, UserAccount userAccount, Date expiration) {
+    this.token = token;
+    this.userAccount = userAccount;
+    this.expiration = expiration;
   }
 
   public Long getId() {
@@ -39,11 +44,11 @@ public class EmailVerification {
     this.id = id;
   }
 
-  public UUID getToken() {
+  public String getToken() {
     return token;
   }
 
-  public void setToken(UUID token) {
+  public void setToken(String token) {
     this.token = token;
   }
 

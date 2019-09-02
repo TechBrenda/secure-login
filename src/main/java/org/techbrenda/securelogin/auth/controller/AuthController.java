@@ -21,8 +21,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.techbrenda.securelogin.auth.dto.AuthRequest;
+import org.techbrenda.securelogin.auth.dto.AuthResponse;
+import org.techbrenda.securelogin.auth.dto.RegisterRequest;
 import org.techbrenda.securelogin.auth.exception.AuthException;
 import org.techbrenda.securelogin.auth.service.JwtService;
+import org.techbrenda.securelogin.auth.service.RegistrationService;
 
 @RestController
 public class AuthController {
@@ -32,6 +36,9 @@ public class AuthController {
   
   @Autowired
   private JwtService jwtService;
+  
+  @Autowired
+  private RegistrationService registrationService;
   
   @PostMapping("/authenticate")
   public ResponseEntity<?> createAuthToken(@RequestBody AuthRequest authRequest) throws AuthException {
@@ -57,9 +64,11 @@ public class AuthController {
   }
   
   @PostMapping("/register")
-  public void registration() {}
+  public void registration(@RequestBody RegisterRequest registerRequest) {
+    registrationService.registerNewUser(registerRequest);
+  }
   
-  @GetMapping("/confirmemail")
+  @GetMapping("/confirmEmail")
   public void confirmRegistration() {}
   
   @ExceptionHandler({ AuthException.class })
