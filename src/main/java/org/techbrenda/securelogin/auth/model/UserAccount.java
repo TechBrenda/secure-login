@@ -49,8 +49,6 @@ public class UserAccount {
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy/MM/dd HH:mm:ss.SSSZ")
   private Date passwordReminderExpire;
   
-  private String emailConfirmationToken;
-  
   @ManyToMany
   private Set<Authority> authorities = new HashSet<>();
 
@@ -135,14 +133,6 @@ public class UserAccount {
 
   public void setPasswordReminderExpire(Date passwordReminderExpire) {
     this.passwordReminderExpire = passwordReminderExpire;
-  }
-
-  public String getEmailConfirmationToken() {
-    return emailConfirmationToken;
-  }
-
-  public void setEmailConfirmationToken(String emailConfirmationToken) {
-    this.emailConfirmationToken = emailConfirmationToken;
   }
 
   public Set<Authority> getAuthorities() {

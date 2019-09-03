@@ -5,6 +5,7 @@ import java.util.Objects;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AccountExpiredException;
@@ -24,7 +25,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.techbrenda.securelogin.auth.dto.AuthRequest;
 import org.techbrenda.securelogin.auth.dto.AuthResponse;
 import org.techbrenda.securelogin.auth.dto.RegisterRequest;
+import org.techbrenda.securelogin.auth.event.OnRegistrationCompleteEvent;
 import org.techbrenda.securelogin.auth.exception.AuthException;
+import org.techbrenda.securelogin.auth.model.UserAccount;
 import org.techbrenda.securelogin.auth.service.JwtService;
 import org.techbrenda.securelogin.auth.service.RegistrationService;
 
@@ -39,6 +42,9 @@ public class AuthController {
   
   @Autowired
   private RegistrationService registrationService;
+  
+  @Autowired
+  private ApplicationEventPublisher eventPublisher;
   
   @PostMapping("/authenticate")
   public ResponseEntity<?> createAuthToken(@RequestBody AuthRequest authRequest) throws AuthException {
@@ -65,7 +71,16 @@ public class AuthController {
   
   @PostMapping("/register")
   public void registration(@RequestBody RegisterRequest registerRequest) {
-    registrationService.registerNewUser(registerRequest);
+    UserAccount newUserAccount = registrationService.registerNewUser(registerRequest);
+    if (newUserAccount == null) {
+      throw new AuthException("USERNAME_NOT_AVAILABLE");
+    }
+    
+    try {
+      eventPublisher.publishEvent(new OnRegistrationCompleteEvent(newUserAccount));
+    } catch (Exception e) {
+      throw new AuthException("EMAIL_EXCEPTION", e);
+    }
   }
   
   @GetMapping("/confirmEmail")

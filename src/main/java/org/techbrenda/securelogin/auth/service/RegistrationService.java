@@ -34,27 +34,33 @@ public class RegistrationService {
   @Autowired
   private EmailVerificationRepository emailVerificationRepo;
   
-  public void registerNewUser(RegisterRequest registration) {
-    UserAccount userAccount = new UserAccount();
-    userAccount.setEmail(registration.getEmail());
-    userAccount.setPassword(bCryptPasswordEncoder.encode(registration.getPassword()));
-    userAccount.setEnabled(false);
-    userAccount.setAccountNonExpired(true);
-    userAccount.setAccountNonLocked(true);
-    userAccount.setCredentialsNonExpired(true);
-    
-    Authority userAuthority = authorityRepo.findByRolename("ROLE_USER");
-    userAccount.addAuthority(userAuthority);
-    userAccountRepo.save(userAccount);
-    
-    UserProfile userProfile = new UserProfile();
-    userProfile.setFirstName(registration.getFirstname());
-    userProfile.setLastName(registration.getLastname());
-    userProfile.setTimeZone(registration.getTimezone());
-    userProfile.setUserAccount(userAccount);
-    userProfileRepo.save(userProfile);
-    
-    // createVerificationToken(userAccount);
+  public UserAccount registerNewUser(RegisterRequest registration) {
+    UserAccount newUserAccount = userAccountRepo.findByEmail(registration.getEmail());
+    if (newUserAccount != null) {
+      // User account already exists. New user cannot be created
+      return null;
+    } else {
+      newUserAccount = new UserAccount();
+      newUserAccount.setEmail(registration.getEmail());
+      newUserAccount.setPassword(bCryptPasswordEncoder.encode(registration.getPassword()));
+      newUserAccount.setEnabled(false);
+      newUserAccount.setAccountNonExpired(true);
+      newUserAccount.setAccountNonLocked(true);
+      newUserAccount.setCredentialsNonExpired(true);
+      
+      Authority userAuthority = authorityRepo.findByRolename("ROLE_USER");
+      newUserAccount.addAuthority(userAuthority);
+      userAccountRepo.save(newUserAccount);
+      
+      UserProfile userProfile = new UserProfile();
+      userProfile.setFirstName(registration.getFirstname());
+      userProfile.setLastName(registration.getLastname());
+      userProfile.setTimeZone(registration.getTimezone());
+      userProfile.setUserAccount(newUserAccount);
+      userProfileRepo.save(userProfile);
+      
+      return newUserAccount;
+    }
   }
   
   private Date calculateExpiration() {
@@ -65,10 +71,12 @@ public class RegistrationService {
     return new Date(calendar.getTime().getTime());
   }
   
-  public void createVerificationToken(UserAccount userAccount) {
+  public String createVerificationToken(UserAccount userAccount) {
     String token = UUID.randomUUID().toString();
     Date expiration = calculateExpiration();
     EmailVerification verification = new EmailVerification(token, userAccount, expiration);
     emailVerificationRepo.save(verification);
+    
+    return verification.getToken();
   }
 }
