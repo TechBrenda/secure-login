@@ -52,9 +52,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         .and()
         .authorizeRequests().antMatchers("/h2-console/**").permitAll()
         .and()
-        .authorizeRequests().antMatchers("/authenticate", "/register").permitAll()
-        .and()
-        .authorizeRequests().antMatchers("/refresh").authenticated()
+        .authorizeRequests().antMatchers("/authenticate", "/register", "/confirmEmail").permitAll()
         .and()
         .authorizeRequests().anyRequest().authenticated();
     

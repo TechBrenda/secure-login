@@ -21,12 +21,14 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.techbrenda.securelogin.auth.dto.AuthRequest;
 import org.techbrenda.securelogin.auth.dto.AuthResponse;
 import org.techbrenda.securelogin.auth.dto.RegisterRequest;
 import org.techbrenda.securelogin.auth.event.OnRegistrationCompleteEvent;
 import org.techbrenda.securelogin.auth.exception.AuthException;
+import org.techbrenda.securelogin.auth.model.EmailVerification;
 import org.techbrenda.securelogin.auth.model.UserAccount;
 import org.techbrenda.securelogin.auth.service.JwtService;
 import org.techbrenda.securelogin.auth.service.RegistrationService;
@@ -72,7 +74,7 @@ public class AuthController {
   @PostMapping("/register")
   public void registration(@RequestBody RegisterRequest registerRequest) {
     UserAccount newUserAccount = registrationService.registerNewUser(registerRequest);
-    if (newUserAccount == null) {
+    if (newUserAccount == null) { // email already used in existing user account
       throw new AuthException("USERNAME_NOT_AVAILABLE");
     }
     
@@ -84,7 +86,24 @@ public class AuthController {
   }
   
   @GetMapping("/confirmEmail")
-  public void confirmRegistration() {}
+  public void confirmRegistration(@RequestParam("token") String token) {
+    EmailVerification verification = registrationService.getEmailVerificationFromToken(token);
+    if (verification == null) {
+      throw new AuthException("INVALID_EMAIL_VERIFICATION_TOKEN");
+    }
+    
+    UserAccount userAccount = registrationService.getUserAccountFromEmailVerification(verification);
+    
+    if (registrationService.isTokenExpired(verification.getExpiration())) {
+      try {
+        eventPublisher.publishEvent(new OnRegistrationCompleteEvent(userAccount));
+      } catch (Exception e) {
+        throw new AuthException("EMAIL_EXCEPTION", e);
+      }
+    } else {
+      registrationService.enableUserAccount(userAccount);
+    }
+  }
   
   @ExceptionHandler({ AuthException.class })
   public ResponseEntity<String> handleAuthException(AuthException e) {

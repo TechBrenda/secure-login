@@ -2,6 +2,7 @@ package org.techbrenda.securelogin.auth.service;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -78,5 +79,33 @@ public class RegistrationService {
     emailVerificationRepo.save(verification);
     
     return verification.getToken();
+  }
+  
+  public EmailVerification getEmailVerificationFromToken(String token) {
+    return emailVerificationRepo.findByToken(token);
+  }
+  
+  public boolean isTokenExpired(Date expiration) {
+    Date rightNow = new Date();
+    
+    return expiration.before(rightNow);
+  }
+  
+  public UserAccount getUserAccountFromEmailVerification(EmailVerification verification) {
+    return userAccountRepo.findById(verification.getUserAccount().getId()).get();
+  }
+  
+  public void enableUserAccount(UserAccount userAccount) {
+    userAccount.setEnabled(true);
+    userAccountRepo.save(userAccount);
+    
+    removeUsedEmailVerifications(userAccount);
+  }
+  
+  private void removeUsedEmailVerifications(UserAccount userAccount) {
+    List<EmailVerification> userTokens = emailVerificationRepo.findByUserAccount(userAccount);
+    for (EmailVerification verification : userTokens) {
+      emailVerificationRepo.delete(verification);
+    }
   }
 }
